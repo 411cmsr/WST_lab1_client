@@ -5,10 +5,11 @@ import (
 	"encoding/xml"
 	"flag"
 	"fmt"
-	"go.uber.org/zap"
 	"io"
 	"log"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 type Person struct {
@@ -118,8 +119,6 @@ func sendSOAPRequest(url string, requestXML []byte, logger *zap.Logger) ([]byte,
 		return nil, err
 	}
 
-	logger.Info("Received SOAP response", zap.String("response", string(body)))
-
 	return body, nil
 }
 
@@ -128,36 +127,38 @@ func printFullResponse(body []byte, logger *zap.Logger) error {
 	err := xml.Unmarshal(body, &response)
 	if err != nil {
 		logger.Fatal("Error unmarshalling response", zap.Error(err))
+		return err
 	}
+
 	if response.Body.Fault != nil {
-		fmt.Printf(response.Body.Fault.FaultString)
+		logger.Warn("Received Fault", zap.String("faultstring", response.Body.Fault.FaultString))
+		fmt.Println(response.Body.Fault.FaultString)
+		return nil
 	}
 
-	if response.Body.Content == nil {
-		fmt.Println("Person not found")
+	if response.Body.Content == nil || response.Body.Content.Message == "" {
+		message := "Response is empty"
+		logger.Info(message)
+		fmt.Println(message)
+		return nil
 	}
-	if response.Body.Content.Message != "" {
-		fmt.Println("Result of request execution:")
-		for _, person := range response.Body.Content.Persons {
-			fmt.Printf("- ID: %d, Name: %s, Surname: %s, Age: %d\n",
-				person.ID,
-				person.Name,
-				person.Surname,
-				person.Age,
-			)
-			logger.Info("Result of request execution",
-				zap.Int("ID", person.ID),
-				zap.String("Name", person.Name),
-				zap.String("Surname", person.Surname),
-				zap.Int("Age", person.Age),
-			)
-		}
-		//fmt.Println("Person not found")
-	}
-	//fmt.Println("Person not found")
 
-	//fmt.Println("Person not found")
-	return err
+	for _, person := range response.Body.Content.Persons {
+		fmt.Printf("- ID: %d, Name: %s, Surname: %s, Age: %d\n",
+			person.ID,
+			person.Name,
+			person.Surname,
+			person.Age,
+		)
+
+		logger.Info("Result of request execution",
+			zap.Int("ID", person.ID),
+			zap.String("Name", person.Name),
+			zap.String("Surname", person.Surname),
+			zap.Int("Age", person.Age),
+		)
+	}
+	return nil
 }
 
 func addPerson(url string, person Person, logger *zap.Logger) {
@@ -209,7 +210,7 @@ func getAllPersons(url string, logger *zap.Logger) {
 		logger.Warn("Error calling GetAllPersons", zap.Error(err))
 		return
 	}
-	//fmt.Println(string(body))
+
 	err = printFullResponse(body, logger)
 	if err != nil {
 		return
@@ -276,7 +277,6 @@ func searchPersons(url string, query string, logger *zap.Logger) {
 		logger.Warn("Error calling SearchPersons", zap.Error(err))
 		return
 	}
-	//fmt.Println(string(body))
 
 	err = printFullResponse(body, logger)
 	if err != nil {
@@ -297,28 +297,44 @@ func main() {
 		}
 	}(logger)
 
-	url := flag.String("url", "http://localhost:8080/", "SOAP server URL")
+	url := flag.String("url", "http://localhost:8094/soap", "SOAP server URL")
 	method := flag.String("method", "", "Method to call (addperson|getperson|getallpersons|updateperson|deleteperson|searchperson)")
-	name := flag.String("name", "", "Name of the person")
-	surname := flag.String("surname", "", "Surname of the person")
-	id := flag.Int("id", 0, "ID of the person")
-	query := flag.String("query", "", "Query for searching person")
+	name := flag.String("name", "", "Name of the person (required for addperson and updateperson)")
+	surname := flag.String("surname", "", "Surname of the person (required for addperson and updateperson)")
+	id := flag.Int("id", 0, "ID of the person (required for getperson, updateperson and deleteperson)")
+	query := flag.String("query", "", "Query for searching person (required for searchperson)")
+	age := flag.Int("age", 0, "Age of the person (required for addperson and updateperson)")
 
 	flag.Parse()
 
 	switch *method {
 	case "addperson":
-		addPerson(*url, Person{Name: *name, Surname: *surname}, logger)
+		if *name == "" || *surname == "" || *age <= 0 {
+			log.Fatal("Both name and surname are required for addperson. Age must be greater than 0.")
+		}
+		addPerson(*url, Person{Name: *name, Surname: *surname, Age: *age}, logger)
 	case "getperson":
+		if *id <= 0 {
+			log.Fatal("ID must be greater than 0 for getperson.")
+		}
 		getPerson(*url, *id, logger)
 	case "getallpersons":
 		getAllPersons(*url, logger)
 	case "updateperson":
-		updateInfo := Person{ID: *id, Name: *name, Surname: *surname}
+		if *id <= 0 || *name == "" || *surname == "" || *age <= 0 {
+			log.Fatal("ID must be greater than 0 and both name and surname are required for updateperson. Age must be greater than 0.")
+		}
+		updateInfo := Person{ID: *id, Name: *name, Surname: *surname, Age: *age}
 		updatePerson(*url, updateInfo, logger)
 	case "deleteperson":
+		if *id <= 0 {
+			log.Fatal("ID must be greater than 0 for deleteperson.")
+		}
 		deletePerson(*url, *id, logger)
 	case "searchperson":
+		if *query == "" {
+			log.Fatal("Query is required for searchperson.")
+		}
 		searchPersons(*url, *query, logger)
 	default:
 		log.Fatal("Unknown method. Use one of addperson|getperson|getallpersons|updateperson|deleteperson|searchperson.")
