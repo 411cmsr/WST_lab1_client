@@ -32,7 +32,9 @@
 
 ### **example request:** 
 
-#### go run main.go -method searchperson -query Иван -url http://127.0.0.1:8094/soap example response:
+#### go run main.go -method searchperson -query Иван -url http://127.0.0.1:8094/soap 
+
+### **example response:**
 
 _ID: 642, Name: Владимир, Surname: Иванов, Age: 26_
 _ID: 643, Name: Иван, Surname: Иванов, Age: 27_
