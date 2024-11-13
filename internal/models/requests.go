@@ -18,7 +18,8 @@ type UpdatePersonRequest struct {
 }
 
 type DeletePersonRequest struct {
-	ID int `xml:"id"`
+	XMLName xml.Name `xml:"DeletePerson"`
+	ID      int      `xml:"id"`
 }
 
 type SearchPersonRequest struct {
