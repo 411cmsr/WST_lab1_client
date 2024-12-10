@@ -5,4 +5,6 @@ type Person struct {
 	Name    string `xml:"name"`
 	Surname string `xml:"surname"`
 	Age     int    `xml:"age"`
+	Email   string `xml:"email"`
+	Telephone string `xml:"telephone"`
 }

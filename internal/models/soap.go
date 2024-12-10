@@ -5,8 +5,7 @@ type Fault struct {
 }
 
 type Content struct {
-	Message string   `xml:"chardata"`
-	Persons []Person `xml:"person"`
+	Persons []Person `xml:"person"` 
 }
 
 type Body struct {

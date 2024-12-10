@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
+
+	"go.uber.org/zap"
 
 	"WST_lab1_client/internal/models"
 )
@@ -34,18 +35,14 @@ func AddPersonHandler(url string, name string, surname string, age int, logger *
 }
 
 func GetPersonHandler(url string, id int, logger *zap.Logger) {
-	request := models.GetPersonRequest{ID: id}
-	requestXML, err := xml.Marshal(request)
-	if err != nil {
-		logger.Fatal("Error marshaling request", zap.Error(err))
-	}
+	requestXML := []byte(fmt.Sprintf(`<GetPerson><id>%d</id></GetPerson>`, id))
 
 	body, err := sendSOAPRequest(url, requestXML, logger)
 	if err != nil {
 		logger.Warn("Error calling GetPerson", zap.Error(err))
 		return
 	}
-	fmt.Println(string(body))
+
 	err = printFullResponse(body, logger)
 	if err != nil {
 		return
@@ -179,7 +176,6 @@ func sendSOAPRequest(url string, requestXML []byte, logger *zap.Logger) ([]byte,
 func printFullResponse(body []byte, logger *zap.Logger) error {
 	var response models.Envelope
 	err := xml.Unmarshal(body, &response)
-	//fmt.Println("body", string(body))
 	if err != nil {
 		logger.Fatal("Error unmarshalling response", zap.Error(err))
 		return err
@@ -190,21 +186,23 @@ func printFullResponse(body []byte, logger *zap.Logger) error {
 		fmt.Println(response.Body.Fault.FaultString)
 		return nil
 	}
-	//fmt.Println("response.Body.Content\n", response.Body.Content)
-	//fmt.Println("response.Body.Content.Message\n", response.Body.Content.Persons)
+
 	if response.Body.Content == nil || len(response.Body.Content.Persons) == 0 {
 		message := "Response is empty"
 		logger.Info(message)
 		fmt.Println(message)
 		return nil
 	}
+
 	fmt.Println("Result of request execution:")
 	for _, person := range response.Body.Content.Persons {
-		fmt.Printf("- ID: %d, Name: %s, Surname: %s, Age: %d\n",
+		fmt.Printf("- ID: %d, Name: %s, Surname: %s, Age: %d, Email: %s, Telephone: %s\n",
 			person.ID,
 			person.Name,
 			person.Surname,
 			person.Age,
+			person.Email,
+			person.Telephone,
 		)
 
 		logger.Info("Result of request execution",
@@ -212,6 +210,8 @@ func printFullResponse(body []byte, logger *zap.Logger) error {
 			zap.String("Name", person.Name),
 			zap.String("Surname", person.Surname),
 			zap.Int("Age", person.Age),
+			zap.String("Email", person.Email),
+			zap.String("Telephone", person.Telephone),
 		)
 	}
 	return nil
