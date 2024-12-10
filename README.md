@@ -15,7 +15,7 @@
 
 -name string 
 
-######     _Name of the person (required for addperson and updateperson)_ 
+######     _Name o[]()f the person (required for addperson and updateperson)_ 
 
 -age int 
 
@@ -24,6 +24,14 @@
 -surname string 
 
 ######     _Surname of the person (required for addperson and updateperson)_
+
+-email string
+
+######     _Email of the person (required for addperson and updateperson)_
+
+-telephone string
+
+######     _Telephone of the person (required for addperson and updateperson)_
 
 -query string 
 

@@ -12,8 +12,8 @@ import (
 	"WST_lab1_client/internal/models"
 )
 
-func AddPersonHandler(url string, name string, surname string, age int, logger *zap.Logger) {
-	person := models.Person{Name: name, Surname: surname, Age: age}
+func AddPersonHandler(url string, name string, surname string, age int, email string, telephone string, logger *zap.Logger) {
+	person := models.Person{Name: name, Surname: surname, Age: age, Email: email, Telephone: telephone}
 	request := models.AddPersonRequest{Person: person}
 	requestXML, err := xml.Marshal(request)
 	if err != nil {
@@ -64,8 +64,8 @@ func GetAllPersonsHandler(url string, logger *zap.Logger) {
 	}
 }
 
-func UpdatePersonHandler(url string, id int, name string, surname string, age int, logger *zap.Logger) {
-	person := models.Person{ID: id, Name: name, Surname: surname, Age: age}
+func UpdatePersonHandler(url string, id int, name string, surname string, age int, email string, telephone string, logger *zap.Logger) {
+	person := models.Person{ID: id, Name: name, Surname: surname, Age: age, Email: email, Telephone: telephone}
 	request := models.UpdatePersonRequest{Person: person}
 	requestXML, err := xml.Marshal(request)
 	if err != nil {

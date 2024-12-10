@@ -25,6 +25,8 @@ func main() {
 	method := flag.String("method", "", "Method to call (addperson|getperson|getallpersons|updateperson|deleteperson|searchperson)")
 	name := flag.String("name", "", "Name of the person (required for addperson and updateperson)")
 	surname := flag.String("surname", "", "Surname of the person (required for addperson and updateperson)")
+	email := flag.String("email", "", "Email of the person (required for addperson and updateperson)")
+	telephone := flag.String("telephone", "", "Telephone of the person (required for addperson and updateperson)")
 	id := flag.Int("id", 0, "ID of the person (required for getperson, updateperson and deleteperson)")
 	query := flag.String("query", "", "Query for searching person (required for searchperson)")
 	age := flag.Int("age", 0, "Age of the person (required for addperson and updateperson)")
@@ -33,10 +35,10 @@ func main() {
 
 	switch *method {
 	case "addperson":
-		if *name == "" || *surname == "" || *age <= 0 {
+		if *name == "" || *surname == "" || *email == "" || *telephone == "" || *age <= 0 {
 			log.Fatal("Both name and surname are required for addperson. Age must be greater than 0.")
 		}
-		handlers.AddPersonHandler(*url, *name, *surname, *age, log)
+		handlers.AddPersonHandler(*url, *name, *surname, *age, *email, *telephone, log)
 	case "getperson":
 		if *id <= 0 {
 			log.Fatal("ID must be greater than 0 for getperson.")
@@ -45,10 +47,10 @@ func main() {
 	case "getallpersons":
 		handlers.GetAllPersonsHandler(*url, log)
 	case "updateperson":
-		if *id <= 0 || *name == "" || *surname == "" || *age <= 0 {
+		if *id <= 0 || *name == "" || *surname == "" || *email == "" || *telephone == "" || *age <= 0 {
 			log.Fatal("ID must be greater than 0 and both name and surname are required for updateperson. Age must be greater than 0.")
 		}
-		handlers.UpdatePersonHandler(*url, *id, *name, *surname, *age, log)
+		handlers.UpdatePersonHandler(*url, *id, *name, *surname, *age, *email, *telephone, log)
 	case "deleteperson":
 		if *id <= 0 {
 			log.Fatal("ID must be greater than 0 for deleteperson.")
