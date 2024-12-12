@@ -102,13 +102,20 @@ func DeletePersonHandler(url string, id int, logger *zap.Logger) {
 		return
 	}
 	fmt.Printf(string(body))
-	var response models.DeletePersonResponse
+	var response models.Envelope
+	//var response models.DeletePersonResponse
 	if err := xml.Unmarshal(body, &response); err != nil {
 		logger.Fatal("Error unmarshalling response", zap.Error(err))
 		return
 	}
+	fmt.Println("RRRRRRRRRRRRRRRRRR", response)
+	if response.Body.Fault != nil {
+		logger.Warn("Received Fault", zap.String("faultstring", response.Body.Fault.FaultString))
+		fmt.Println(response.Body.Fault.FaultString)
+		return
+	}
 
-	fmt.Printf("Deleted person successfully: %v\n", response.Success)
+	fmt.Printf("Status of deleting person: %v\n", response.Body.Content)
 }
 
 func SearchPersonsHandler(url string, query string, logger *zap.Logger) {
@@ -126,6 +133,7 @@ func SearchPersonsHandler(url string, query string, logger *zap.Logger) {
 	}
 
 	err = printFullResponse(body, logger)
+
 	if err != nil {
 		return
 	}
