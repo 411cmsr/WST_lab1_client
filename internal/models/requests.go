@@ -19,10 +19,29 @@ type UpdatePersonRequest struct {
 
 type DeletePersonRequest struct {
 	XMLName xml.Name `xml:"DeletePerson"`
-	ID int `xml:"id"`
+	ID      int      `xml:"id"`
 }
 
 type SearchPersonRequest struct {
 	XMLName xml.Name `xml:"SearchPerson"`
 	Query   string   `xml:"query"`
+}
+
+// ////////////////////////////////////////
+
+// Envelope представляет корневой элемент SOAP
+type Envelope struct {
+	XMLName xml.Name `xml:"http://schemas.xmlsoap.org/soap/envelope/ Envelope"`
+	Header  Header   `xml:"Header"`
+	Body    Body     `xml:"Body"`
+}
+
+// Header представляет заголовок SOAP
+type Header struct {
+	// Здесь можно добавить поля, если они нужны
+}
+
+// Body представляет тело SOAP сообщения
+type Body struct {
+	Content interface{} `xml:",any"` // Используем интерфейс для динамического содержимого
 }
