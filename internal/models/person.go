@@ -1,10 +1,10 @@
 package models
 
 type Person struct {
-	ID      int    `xml:"id"`
-	Name    string `xml:"name"`
-	Surname string `xml:"surname"`
-	Age     int    `xml:"age"`
-	Email   string `xml:"email"`
-	Telephone string `xml:"telephone"`
+	ID        int    `xml:"ID"`
+	Name      string `xml:"Name"`
+	Surname   string `xml:"Surname"`
+	Age       int    `xml:"Age"`
+	Email     string `xml:"Email"`
+	Telephone string `xml:"Telephone"`
 }
