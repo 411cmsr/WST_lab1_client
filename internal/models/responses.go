@@ -1,15 +1,49 @@
 package models
+import"encoding/xml"
+
+type Envelope struct {
+	XMLName xml.Name `xml:"soap:Envelope"`
+	Body    Body     `xml:"soap:Body"`
+}
+
+type Body struct {
+	Fault        *Fault             `xml:"Fault,omitempty"`
+	Content      interface{}        `xml:",any"` // This allows for any content
+}
+
+type Fault struct {
+	FaultCode   string `xml:"faultcode"`
+	FaultString string `xml:"faultstring"`
+}
+
+type DeleteResponse struct {
+	Status bool `xml:"status"`
+}
+
+type SearchPersonResponse struct {
+	Persons []Person `xml:"Persons>Person"`
+}
 
 type AddPersonResponse struct {
-	Content struct {
-		ID int `xml:"id"`
-	} `xml:"Body"`
+	ID int `xml:"ID"`
 }
 
 type UpdatePersonResponse struct {
-	Success bool `xml:"success"`
+	Status bool `xml:"status"`
 }
 
-type DeletePersonResponse struct {
-	Success bool `xml:"success"`
+type GetPersonResponse struct {
+	Person Person `xml:"Person"`
+}
+
+type GetAllPersonsResponse struct {
+	Persons []Person `xml:"Persons>Person"`
+}
+
+type ErrorResponse struct {
+	Type     string `xml:"type"`
+	Title    string `xml:"title"`
+	Status   int    `xml:"status"`
+	Detail   string `xml:"detail"`
+	Instance string `xml:"instance"`
 }
