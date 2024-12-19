@@ -1,5 +1,6 @@
 package models
-import"encoding/xml"
+
+import "encoding/xml"
 
 type Envelope struct {
 	XMLName xml.Name `xml:"soap:Envelope"`
@@ -7,8 +8,8 @@ type Envelope struct {
 }
 
 type Body struct {
-	Fault        *Fault             `xml:"Fault,omitempty"`
-	Content      interface{}        `xml:",any"` // This allows for any content
+	Fault   *Fault      `xml:"Fault,omitempty"`
+	Content interface{} `xml:",any"` // This allows for any content
 }
 
 type Fault struct {
@@ -37,7 +38,8 @@ type GetPersonResponse struct {
 }
 
 type GetAllPersonsResponse struct {
-	Persons []Person `xml:"Persons>Person"`
+	//Persons []Person `xml:"Persons>Person"`
+	Persons []Person `xml:"persons"`
 }
 
 type ErrorResponse struct {

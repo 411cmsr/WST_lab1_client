@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	
+
+	"WST_lab1_client/internal/models"
 
 	"go.uber.org/zap"
-	"WST_lab1_client/internal/models"
 )
 
 // SendRequest sends a SOAP request to the specified URL and returns the response.
@@ -43,7 +45,7 @@ func SendRequest(url string, requestXML []byte, logger *zap.Logger) ([]byte, err
 		logger.Warn("Received non-OK response status", zap.Int("status", resp.StatusCode), zap.String("response", string(bodyResponse)))
 		return bodyResponse, fmt.Errorf("received non-OK response status: %d", resp.StatusCode)
 	}
-
+	//fmt.Println(string(bodyResponse))
 	return bodyResponse, nil
 }
 
@@ -66,9 +68,13 @@ func PrintResult(result interface{}) {
 	case models.UpdatePersonResponse:
 		fmt.Printf("Update status: %v\n", res.Status)
 	case models.GetPersonResponse:
-		fmt.Printf("Retrieved person: %+v\n", res.Person)
+		fmt.Printf("Retrieved person:\n ID: %+v\n Name: %v\n Surname: %v\n Age: %v\n Email: %v\n Telephone: %v\n", res.Person.ID, res.Person.Name, res.Person.Surname, res.Person.Age, res.Person.Email, res.Person.Telephone)
 	case models.GetAllPersonsResponse:
-		fmt.Printf("Retrieved persons: %+v\n", res.Persons)
+		for _, p := range res.Persons {
+			fmt.Printf("Person: ID: %+v Name: %v Surname: %v Age: %v Email: %v Telephone: %v\n", p.ID, p.Name, p.Surname, p.Age, p.Email, p.Telephone)
+			//fmt.Printf("Person: %+v\n", p)
+		}
+		//fmt.Printf("Retrieved persons: %+v\n", res.Persons)
 	case models.SearchPersonResponse:
 		fmt.Printf("Search results: %+v\n", res.Persons)
 	default:
