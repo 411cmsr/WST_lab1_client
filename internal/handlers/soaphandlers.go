@@ -84,19 +84,20 @@ func PrintResult(result interface{}) {
 
 // PrintError prints error details from the SOAP error response.
 func PrintError(body []byte, logger *zap.Logger) {
-	var errorResponse models.ErrorResponse
+	var errorResponse models.Fault
+	fmt.Println(string(body))
 	if err := xml.Unmarshal(body, &errorResponse); err == nil {
 		logger.Warn("SOAP Error Response",
-			zap.String("title", errorResponse.Title),
-			zap.Int("status", errorResponse.Status),
-			zap.String("detail", errorResponse.Detail),
-			zap.String("instance", errorResponse.Instance),
+			zap.String("FaultCode", errorResponse.FaultCode),
+			zap.String("FaultString", errorResponse.FaultString),
+
+
 		)
 		fmt.Printf("Error: %s (Status: %d)\nDetail: %s\nInstance: %s\n",
-			errorResponse.Title,
-			errorResponse.Status,
-			errorResponse.Detail,
-			errorResponse.Instance,
+			errorResponse.FaultCode,
+			errorResponse.FaultString,
+			
+			
 		)
 	} else {
 		logger.Warn("Failed to parse error response",

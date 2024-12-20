@@ -15,6 +15,12 @@ type Body struct {
 type Fault struct {
 	FaultCode   string `xml:"faultcode"`
 	FaultString string `xml:"faultstring"`
+	FaultDetail string `xml:"detail"`
+
+}
+type FaultDetail struct {
+	ErrorCode string `xml:"errorCode"`
+	ErrorMessage string `xml:"errorMessage"`
 }
 
 type DeleteResponse struct {
@@ -43,9 +49,21 @@ type GetAllPersonsResponse struct {
 }
 
 type ErrorResponse struct {
-	Type     string `xml:"type"`
-	Title    string `xml:"title"`
-	Status   int    `xml:"status"`
-	Detail   string `xml:"detail"`
-	Instance string `xml:"instance"`
+	
+	Envelope struct {} `xml:"Envelope"`
+
 }
+// type SOAPFault struct {
+
+// }
+
+
+
+
+// type ErrorResponse struct {
+// 	Type     string `xml:"type"`
+// 	Title    string `xml:"title"`
+// 	Status   int    `xml:"status"`
+// 	Detail   string `xml:"detail"`
+	
+// }
