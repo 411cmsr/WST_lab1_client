@@ -9,14 +9,22 @@ type Envelope struct {
 
 type Body struct {
 	Fault   *Fault      `xml:"Fault,omitempty"`
-	Content interface{} `xml:",any"` // This allows for any content
+	Content interface{} `xml:",any"` 
+}
+type SOAPFault struct {
+	XMLName xml.Name `xml:"SOAPFault"`
+	Envelope struct {
+		Body struct {
+			Fault Fault `xml:"Fault"`
+		 } `xml:"Body"`
+			 
+   	}`xml:"Envelope"`
 }
 
 type Fault struct {
-	FaultCode   string `xml:"faultcode"`
+	FaultCode string `xml:"faultcode"`
 	FaultString string `xml:"faultstring"`
-	FaultDetail string `xml:"detail"`
-
+	FaultDetail FaultDetail `xml:"detail"`
 }
 type FaultDetail struct {
 	ErrorCode string `xml:"errorCode"`
@@ -28,7 +36,7 @@ type DeleteResponse struct {
 }
 
 type SearchPersonResponse struct {
-	Persons []Person `xml:"Persons>Person"`
+	Persons []Person 
 }
 
 type AddPersonResponse struct {
@@ -44,7 +52,7 @@ type GetPersonResponse struct {
 }
 
 type GetAllPersonsResponse struct {
-	//Persons []Person `xml:"Persons>Person"`
+	
 	Persons []Person `xml:"persons"`
 }
 
@@ -53,17 +61,3 @@ type ErrorResponse struct {
 	Envelope struct {} `xml:"Envelope"`
 
 }
-// type SOAPFault struct {
-
-// }
-
-
-
-
-// type ErrorResponse struct {
-// 	Type     string `xml:"type"`
-// 	Title    string `xml:"title"`
-// 	Status   int    `xml:"status"`
-// 	Detail   string `xml:"detail"`
-	
-// }

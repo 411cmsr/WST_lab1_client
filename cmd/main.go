@@ -5,10 +5,10 @@ import (
 	"WST_lab1_client/internal/logger"
 	"WST_lab1_client/internal/models"
 
-	//"WST_lab1_client/internal/soapclient" // Importing the new soapclient package
+
 	"flag"
 	"fmt"
-	//"go.uber.org/zap"
+
 )
 
 func main() {
@@ -26,13 +26,13 @@ func main() {
 	email := flag.String("email", "", "Email of the person (required for addperson and updateperson)")
 	telephone := flag.String("telephone", "", "Telephone of the person (required for addperson and updateperson)")
 	id := flag.Int("id", 0, "ID of the person (required for getperson, updateperson and deleteperson)")
-	//query := flag.String("query", "", "Query for searching person (required for searchperson)")
+	query := flag.String("query", "", "Query for searching person (required for searchperson)")
 	age := flag.Int("age", 0, "Age of the person (required for addperson and updateperson)")
 
 	flag.Parse()
 
 	var requestXML []byte
-	//var response interface{}
+	
 
 	switch *method {
 	case "addperson":
@@ -52,7 +52,7 @@ func main() {
                 </soapenv:Body>
             </soapenv:Envelope>`, *name, *surname, *age, *email, *telephone))
 
-		// Send request and handle response
+	
 		body, err := handlers.SendRequest(*url, requestXML, log)
 		if err != nil {
 			handlers.PrintError(body, log)
@@ -86,7 +86,7 @@ func main() {
 			handlers.PrintResult(deleteResp)
 		}
 
-	// Add similar cases for other methods like getperson, getallpersons etc.
+
 	case "getperson":
 		if *id <= 0 {
 			log.Fatal("ID must be greater than 0 for getperson.")
@@ -110,11 +110,8 @@ func main() {
 			handlers.PrintResult(getResp)
 		}
 
-	// Add similar cases for other methods like getperson, getallpersons etc.
+	
 	case "getallpersons":
-		// if *id <= 0 {
-		// 	log.Fatal("ID must be greater than 0 for getperson.")
-		// }
 		requestXML = []byte(fmt.Sprintf(`
             <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
                 <soapenv:Body>
@@ -131,6 +128,56 @@ func main() {
 		var getAllResp models.GetAllPersonsResponse
 		if err = handlers.ParseResponse(body, &getAllResp, log); err == nil {
 			handlers.PrintResult(getAllResp)
+		}
+	case "updateperson":
+		if *id <= 0 || *name == "" || *surname == "" || *email == "" || *telephone == "" || *age <= 0 {
+			log.Fatal("Both name and surname are required for addperson. Age must be greater than 0.")
+		}
+		requestXML = []byte(fmt.Sprintf(`
+            <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+                <soapenv:Body>
+                    <UpdatePerson>
+						<ID>%d</ID>
+                        <Name>%s</Name>
+                        <Surname>%s</Surname>
+                        <Age>%d</Age>
+                        <Email>%s</Email>
+                        <Telephone>%s</Telephone>
+                    </UpdatePerson>
+                </soapenv:Body>
+            </soapenv:Envelope>`, *id, *name, *surname, *age, *email, *telephone))
+
+		
+		body, err := handlers.SendRequest(*url, requestXML, log)
+		if err != nil {
+			handlers.PrintError(body, log)
+			return
+		}
+		var updatePersonResp models.UpdatePersonResponse
+		if err = handlers.ParseResponse(body, &updatePersonResp, log); err == nil {
+			handlers.PrintResult(updatePersonResp)
+		}
+	case "searchperson":
+		if *query == "" {
+			log.Fatal("Query must be provided for searchperson.")
+		}
+		requestXML = []byte(fmt.Sprintf(`
+			<soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
+				<soapenv:Body>
+					<SearchPerson>
+						<Query>%s</Query>
+					</SearchPerson>
+				</soapenv:Body>
+			</soapenv:Envelope>`, *query))
+	
+		body, err := handlers.SendRequest(*url, requestXML, log)
+		if err != nil {
+			handlers.PrintError(body, log)
+			return
+		}
+		var searchResp models.SearchPersonResponse
+		if err = handlers.ParseResponse(body, &searchResp, log); err == nil {
+			handlers.PrintResult(searchResp)
 		}
 	default:
 		log.Fatal("Unknown method. Use one of addperson|getperson|getallpersons|updateperson|deleteperson|searchperson.")
