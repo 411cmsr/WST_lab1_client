@@ -16,7 +16,8 @@ type AddPersonRequest struct {
 }
 
 type DeletePersonRequest struct {
-	ID int `xml:"ID"`
+	XMLName xml.Name `xml:"DeletePerson"`
+	ID      int      `xml:"id"`
 }
 
 type UpdatePersonRequest struct {
@@ -41,4 +42,17 @@ type Fault struct {
 
 type Content struct {
 	Persons []Person `xml:"Persons>Person"` // Предполагается, что это структура для списка людей
+}
+
+
+type Header struct {
+	
+}
+
+type FaultType struct {
+    FaultCode   string `xml:"faultcode"`
+    FaultString string `xml:"faultstring"`
+}
+type ContentType struct {
+    Persons []Person `xml:"persons"`
 }

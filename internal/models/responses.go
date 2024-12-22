@@ -1,39 +1,46 @@
 package models
 
-//type AddPersonResponse struct {
-//	Content struct {
-//		ID uint `xml:"id"`
-//	} `xml:"Body"`
-//}
-//
-//type UpdatePersonResponse struct {
-//	Success bool `xml:"success"`
-//}
-//
-//type DeletePersonResponse struct {
-//	Success bool `xml:"success"`
-//}
+import "encoding/xml"
 
-// Envelope представляет корневой элемент SOAP
+type Envelope struct {
+	XMLName xml.Name `xml:"soap:Envelope"`
+	Body    Body     `xml:"soap:Body"`
+}
 
-// Header представляет заголовок SOAP
+type Body struct {
+	Fault   *Fault      `xml:"Fault,omitempty"`
+	Content interface{} `xml:",any"` 
+}
+type SOAPFault struct {
+	XMLName xml.Name `xml:"SOAPFault"`
+	Envelope struct {
+		Body struct {
+			Fault Fault `xml:"Fault"`
+		 } `xml:"Body"`
+			 
+   	}`xml:"Envelope"`
+}
 
-// Body представляет тело SOAP сообщения
-//type Body struct {
-//	AddPersonResponse     *AddPersonResponse     `xml:"AddPersonResponse,omitempty"`
-//	DeletePersonResponse  *DeletePersonResponse  `xml:"DeletePersonResponse,omitempty"`
-//	UpdatePersonResponse  *UpdatePersonResponse  `xml:"UpdatePersonResponse,omitempty"`
-//	GetPersonResponse     *GetPersonResponse     `xml:"GetPersonResponse,omitempty"`
-//	GetAllPersonsResponse *GetAllPersonsResponse `xml:"GetAllPersonsResponse,omitempty"`
-//	SearchPersonResponse  *SearchPersonResponse `xml:"SearchPersonResponse,omitempty"`
-//	Fault                 *Fault                `xml:"Fault,omitempty"`
-//}
+type Fault struct {
+	FaultCode string `xml:"faultcode"`
+	FaultString string `xml:"faultstring"`
+	FaultDetail FaultDetail `xml:"detail"`
+}
+type FaultDetail struct {
+	ErrorCode string `xml:"errorCode"`
+	ErrorMessage string `xml:"errorMessage"`
+}
 
-// Fault представляет ошибку в SOAP сообщении
+type DeleteResponse struct {
+	Status bool `xml:"status"`
+}
 
-// AddPersonResponse представляет ответ на запрос добавления человека
+type SearchPersonResponse struct {
+	Persons []Person 
+}
+
 type AddPersonResponse struct {
-	Content PersonID `xml:"Content"` // Предполагается, что Content содержит ID добавленного человека
+	ID int `xml:"ID"`
 }
 
 // GetPersonResponse представляет ответ на запрос получения информации о человеке
@@ -48,27 +55,20 @@ type GetAllPersonsResponse struct {
 
 // UpdatePersonResponse представляет ответ на запрос обновления информации о человеке
 type UpdatePersonResponse struct {
-	Success bool `xml:"Success"` // Успех операции обновления
+	Status bool `xml:"status"`
 }
 
-// DeletePersonResponse представляет ответ на запрос удаления человека
-type DeletePersonResponse struct {
-	Success bool `xml:"Success"` // Успех операции удаления
+type GetPersonResponse struct {
+	Person Person `xml:"Person"`
 }
 
-// SearchPersonResponse представляет ответ на запрос поиска людей
-type SearchPersonResponse struct {
-	Content PersonsList `xml:"Content"`
+type GetAllPersonsResponse struct {
+	
+	Persons []Person `xml:"persons"`
 }
 
-// Person представляет информацию о человеке
+type ErrorResponse struct {
+	
+	Envelope struct {} `xml:"Envelope"`
 
-// PersonsList представляет список людей
-type PersonsList struct {
-	Persons []Person `xml:"Persons>Person"`
-}
-
-// PersonID представляет ID добавленного человека
-type PersonID struct {
-	ID uint `xml:"ID"` // ID добавленного человека
 }
