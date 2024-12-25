@@ -32,10 +32,12 @@ func main() {
 	flag.Parse()
 
 	var requestXML []byte
+	var requireAuth bool
 	
 
 	switch *method {
 	case "addperson":
+		requireAuth = true
 		if *name == "" || *surname == "" || *email == "" || *telephone == "" || *age <= 0 {
 			log.Fatal("Both name and surname are required for addperson. Age must be greater than 0.")
 		}
@@ -53,7 +55,7 @@ func main() {
             </soapenv:Envelope>`, *name, *surname, *age, *email, *telephone))
 
 	
-		body, err := handlers.SendRequest(*url, requestXML, log)
+		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
 			handlers.PrintError(body, log)
 			return
@@ -64,6 +66,7 @@ func main() {
 		}
 
 	case "deleteperson":
+		requireAuth = true
 		if *id <= 0 {
 			log.Fatal("ID must be greater than 0 for deleteperson.")
 		}
@@ -76,7 +79,7 @@ func main() {
                 </soapenv:Body>
             </soapenv:Envelope>`, *id))
 
-		body, err := handlers.SendRequest(*url, requestXML, log)
+		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
 			handlers.PrintError(body, log)
 			return
@@ -100,7 +103,7 @@ func main() {
                 </soapenv:Body>
             </soapenv:Envelope>`, *id))
 
-		body, err := handlers.SendRequest(*url, requestXML, log)
+		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
 			handlers.PrintError(body, log)
 			return
@@ -120,7 +123,7 @@ func main() {
                 </soapenv:Body>
             </soapenv:Envelope>`, *id))
 
-		body, err := handlers.SendRequest(*url, requestXML, log)
+		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
 			handlers.PrintError(body, log)
 			return
@@ -130,6 +133,7 @@ func main() {
 			handlers.PrintResult(getAllResp)
 		}
 	case "updateperson":
+		requireAuth = true
 		if *id <= 0 || *name == "" || *surname == "" || *email == "" || *telephone == "" || *age <= 0 {
 			log.Fatal("Both name and surname are required for addperson. Age must be greater than 0.")
 		}
@@ -148,7 +152,7 @@ func main() {
             </soapenv:Envelope>`, *id, *name, *surname, *age, *email, *telephone))
 
 		
-		body, err := handlers.SendRequest(*url, requestXML, log)
+		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
 			handlers.PrintError(body, log)
 			return
@@ -170,7 +174,7 @@ func main() {
 				</soapenv:Body>
 			</soapenv:Envelope>`, *query))
 	
-		body, err := handlers.SendRequest(*url, requestXML, log)
+		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
 			handlers.PrintError(body, log)
 			return
