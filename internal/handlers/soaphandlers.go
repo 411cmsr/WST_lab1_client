@@ -2,18 +2,22 @@ package handlers
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
-	
+
 	"WST_lab1_client/internal/models"
 
 	"go.uber.org/zap"
 )
 
+func SendRequest(url string, requestXML []byte, logger *zap.Logger,
+	/////////////////////////////////
+	requireAuth bool) ([]byte, error) {
+	///////////////////////////////
 
-func SendRequest(url string, requestXML []byte, logger *zap.Logger) ([]byte, error) {
 	reqBody := bytes.NewBuffer(requestXML)
 
 	req, err := http.NewRequest("POST", url, reqBody)
@@ -23,6 +27,16 @@ func SendRequest(url string, requestXML []byte, logger *zap.Logger) ([]byte, err
 	}
 
 	req.Header.Set("Content-Type", "application/soap+xml; charset=utf-8")
+	//////////////////////////////////////////
+	const (
+		username = "root"
+		password = "password"
+	)
+	if requireAuth {
+		auth := fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", username, password))))
+		req.Header.Set("Authorization", auth)
+	}
+	////////////////////////////////////////////
 
 	logger.Info("Sending SOAP request", zap.String("url", url), zap.String("request", string(requestXML)))
 
@@ -44,10 +58,9 @@ func SendRequest(url string, requestXML []byte, logger *zap.Logger) ([]byte, err
 		logger.Warn("Received non-OK response status", zap.Int("status", resp.StatusCode), zap.String("response", string(bodyResponse)))
 		return bodyResponse, fmt.Errorf("received non-OK response status: %d", resp.StatusCode)
 	}
-	
+
 	return bodyResponse, nil
 }
-
 
 func ParseResponse(body []byte, response interface{}, logger *zap.Logger) error {
 	if err := xml.Unmarshal(body, response); err != nil {
@@ -89,7 +102,6 @@ func PrintError(body []byte, logger *zap.Logger) {
 			zap.String("FaultString", errorResponse.Envelope.Body.Fault.FaultString),
 			zap.String("Detail", errorResponse.Envelope.Body.Fault.FaultDetail.ErrorCode),
 			zap.String("Message", errorResponse.Envelope.Body.Fault.FaultDetail.ErrorMessage),
-
 		)
 		fmt.Printf("Error: \n FaultCode: %s \n FaultString: %s\n Detail:\n ErrorCode: %s\n ErrorMessage: %s\n", errorResponse.Envelope.Body.Fault.FaultCode, errorResponse.Envelope.Body.Fault.FaultString, errorResponse.Envelope.Body.Fault.FaultDetail.ErrorCode, errorResponse.Envelope.Body.Fault.FaultDetail.ErrorMessage)
 	} else {
