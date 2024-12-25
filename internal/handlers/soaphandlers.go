@@ -14,7 +14,7 @@ import (
 )
 
 func SendRequest(url string, requestXML []byte, logger *zap.Logger,
-	/////////////////////////////////
+/////////////////////////////////
 	requireAuth bool) ([]byte, error) {
 	///////////////////////////////
 
@@ -46,7 +46,12 @@ func SendRequest(url string, requestXML []byte, logger *zap.Logger,
 		logger.Error("Error sending request", zap.Error(err))
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			
+		}
+	}(resp.Body)
 
 	bodyResponse, err := io.ReadAll(resp.Body)
 	if err != nil {

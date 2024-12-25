@@ -4,11 +4,10 @@ import (
 	"WST_lab1_client/internal/handlers"
 	"WST_lab1_client/internal/logger"
 	"WST_lab1_client/internal/models"
-
+	"go.uber.org/zap"
 
 	"flag"
 	"fmt"
-
 )
 
 func main() {
@@ -17,7 +16,12 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed logger")
 	}
-	defer log.Sync()
+	defer func(log *zap.Logger) {
+		err := log.Sync()
+		if err != nil {
+
+		}
+	}(log)
 
 	url := flag.String("url", "http://localhost:8094/soap", "SOAP server URL")
 	method := flag.String("method", "", "Method to call (addperson|getperson|getallpersons|updateperson|deleteperson|searchperson)")
@@ -33,7 +37,6 @@ func main() {
 
 	var requestXML []byte
 	var requireAuth bool
-	
 
 	switch *method {
 	case "addperson":
@@ -54,7 +57,6 @@ func main() {
                 </soapenv:Body>
             </soapenv:Envelope>`, *name, *surname, *age, *email, *telephone))
 
-	
 		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
 			handlers.PrintError(body, log)
@@ -89,7 +91,6 @@ func main() {
 			handlers.PrintResult(deleteResp)
 		}
 
-
 	case "getperson":
 		if *id <= 0 {
 			log.Fatal("ID must be greater than 0 for getperson.")
@@ -113,7 +114,6 @@ func main() {
 			handlers.PrintResult(getResp)
 		}
 
-	
 	case "getallpersons":
 		requestXML = []byte(fmt.Sprintf(`
             <soapenv:Envelope xmlns:soapenv="http://www.w3.org/2003/05/soap-envelope">
@@ -121,7 +121,7 @@ func main() {
                     <GetAllPersons>                       
                     </GetAllPersons>
                 </soapenv:Body>
-            </soapenv:Envelope>`, *id))
+            </soapenv:Envelope>`))
 
 		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
@@ -151,7 +151,6 @@ func main() {
                 </soapenv:Body>
             </soapenv:Envelope>`, *id, *name, *surname, *age, *email, *telephone))
 
-		
 		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
 			handlers.PrintError(body, log)
@@ -173,7 +172,7 @@ func main() {
 					</SearchPerson>
 				</soapenv:Body>
 			</soapenv:Envelope>`, *query))
-	
+
 		body, err := handlers.SendRequest(*url, requestXML, log, requireAuth)
 		if err != nil {
 			handlers.PrintError(body, log)

@@ -1,18 +1,20 @@
 package models
 
-//type Envelope struct {
-//	XMLName xml.Name `xml:"http://www.w3.org/2003/05/soap-envelope Envelope"`
-//	Header  Header   `xml:"Header"`
-//	Body    Body    `xml:"Body"`
-//}
+import "encoding/xml"
 
-// Header представляет заголовок SOAP
-
-// Person представляет информацию о человеке
-
-// Запросы
 type AddPersonRequest struct {
-	Person Person `xml:"Person"` // Убедитесь, что структура соответствует формату
+	XMLName xml.Name `xml:"AddPerson"`
+	Person  Person   `xml:"person"`
+}
+
+type GetPersonRequest struct {
+	XMLName xml.Name `xml:"GetPerson"`
+	ID      int      `xml:"id"`
+}
+
+type UpdatePersonRequest struct {
+	XMLName xml.Name `xml:"UpdatePerson"`
+	Person  Person   `xml:"person"`
 }
 
 type DeletePersonRequest struct {
@@ -20,39 +22,18 @@ type DeletePersonRequest struct {
 	ID      int      `xml:"id"`
 }
 
-type UpdatePersonRequest struct {
-	Person Person `xml:"Person"` // Убедитесь, что структура соответствует формату
-}
-
-type GetPersonRequest struct {
-	ID uint `xml:"ID"`
-}
-
-type GetAllPersonsRequest struct{}
-
 type SearchPersonRequest struct {
-	Query string `xml:"query"`
+	XMLName xml.Name `xml:"SearchPerson"`
+	Query   string   `xml:"query"`
 }
-
-// Fault представляет ошибку в SOAP сообщении
-type Fault struct {
-	FaultCode   string `xml:"faultcode"`
-	FaultString string `xml:"faultstring"`
-}
-
-type Content struct {
-	Persons []Person `xml:"Persons>Person"` // Предполагается, что это структура для списка людей
-}
-
 
 type Header struct {
-	
 }
 
 type FaultType struct {
-    FaultCode   string `xml:"faultcode"`
-    FaultString string `xml:"faultstring"`
+	FaultCode   string `xml:"faultcode"`
+	FaultString string `xml:"faultstring"`
 }
 type ContentType struct {
-    Persons []Person `xml:"persons"`
+	Persons []Person `xml:"persons"`
 }
